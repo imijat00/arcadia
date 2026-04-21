@@ -23,7 +23,8 @@ const PROGRAM_ID = new PublicKey(config.PROGRAM_ID);
 function loadKeypair(): Keypair {
   // Render / cloud: set KEYPAIR_BASE64 = base64(cat ~/.config/solana/id.json)
   if (config.KEYPAIR_BASE64) {
-    const secret = JSON.parse(Buffer.from(config.KEYPAIR_BASE64, 'base64').toString('utf-8'));
+    const clean = config.KEYPAIR_BASE64.replace(/\s/g, '');
+    const secret = JSON.parse(Buffer.from(clean, 'base64').toString('utf-8'));
     return Keypair.fromSecretKey(Uint8Array.from(secret));
   }
   // Local: read from file path
