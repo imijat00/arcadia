@@ -21,11 +21,20 @@ const PROGRAM_ID = new PublicKey(config.PROGRAM_ID);
 // ── Keypair & Provider ────────────────────────────────────────────────────────
 
 function loadKeypair(): Keypair {
-  // Render / cloud: set KEYPAIR_BASE64 = base64(cat ~/.config/solana/id.json)
+  // Render / cloud: set KEYPAIR_BASE64 = output of the node command in README
   if (config.KEYPAIR_BASE64) {
-    const clean = config.KEYPAIR_BASE64.replace(/\s/g, '');
-    const secret = JSON.parse(Buffer.from(clean, 'base64').toString('utf-8'));
-    return Keypair.fromSecretKey(Uint8Array.from(secret));
+    // Strip every non-base64 character (whitespace, quotes, etc.)
+    const clean = config.KEYPAIR_BASE64.replace(/[^A-Za-z0-9+/=]/g, '');
+    const decoded = Buffer.from(clean, 'base64').toString('utf-8');
+    try {
+      const secret = JSON.parse(decoded);
+      return Keypair.fromSecretKey(Uint8Array.from(secret));
+    } catch {
+      throw new Error(
+        `KEYPAIR_BASE64 decoded to invalid JSON. ` +
+        `Regenerate it with: node -e "process.stdout.write(Buffer.from(require('fs').readFileSync(require('os').homedir()+'/.config/solana/id.json')).toString('base64'))"`,
+      );
+    }
   }
   // Local: read from file path
   const expanded = config.WALLET_KEYPAIR_PATH.replace('~', process.env.HOME || '');
