@@ -1,0 +1,1963 @@
+{
+  "address": "5ska6kVyEfGjQ7MxfYPoxeBK75JDAzz6q5aYdN26RgbS",
+  "metadata": {
+    "name": "arcadia",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Arcadia — Solana-powered skill-based gaming escrow"
+  },
+  "instructions": [
+    {
+      "name": "accept_duel",
+      "discriminator": [
+        80,
+        52,
+        90,
+        135,
+        172,
+        221,
+        175,
+        102
+      ],
+      "accounts": [
+        {
+          "name": "duel",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  117,
+                  101,
+                  108
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "duel_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "opponent",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "_duel_id",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "close_round",
+      "docs": [
+        "Transitions round from Open → Closed (if enough players) or",
+        "Open → Cancelled (if fewer than MIN_PLAYERS joined).",
+        "",
+        "Security: Only callable after the round's end time has passed."
+      ],
+      "discriminator": [
+        149,
+        14,
+        81,
+        88,
+        230,
+        226,
+        234,
+        37
+      ],
+      "accounts": [
+        {
+          "name": "round",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  111,
+                  117,
+                  110,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "round_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "round"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "_round_id",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "commit_duel_score",
+      "discriminator": [
+        142,
+        140,
+        192,
+        156,
+        174,
+        20,
+        17,
+        72
+      ],
+      "accounts": [
+        {
+          "name": "duel",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  117,
+                  101,
+                  108
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "duel_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "duel_score",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  117,
+                  101,
+                  108,
+                  95,
+                  115,
+                  99,
+                  111,
+                  114,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "duel_id"
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player"
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "duel_id",
+          "type": "u64"
+        },
+        {
+          "name": "commitment",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "commit_score",
+      "docs": [
+        "Backend commits a sha256 hash of (score, wallet, round_id, salt). The",
+        "actual score and salt remain secret until the reveal phase.",
+        "",
+        "Security: The commitment is immutable once written. Neither the player",
+        "nor the backend can change it after this point."
+      ],
+      "discriminator": [
+        6,
+        174,
+        240,
+        11,
+        32,
+        12,
+        177,
+        66
+      ],
+      "accounts": [
+        {
+          "name": "round",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  111,
+                  117,
+                  110,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "round_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "score_entry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  99,
+                  111,
+                  114,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "round_id"
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player",
+          "docs": [
+            "The player whose score is being committed."
+          ]
+        },
+        {
+          "name": "authority",
+          "docs": [
+            "Backend authority that submits the commitment on behalf of the player."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "round_id",
+          "type": "u64"
+        },
+        {
+          "name": "commitment",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_duel",
+      "docs": [
+        "Challenger creates a duel and stakes SOL into the duel's escrow PDA.",
+        "An opponent has 24 hours to accept."
+      ],
+      "discriminator": [
+        49,
+        28,
+        93,
+        11,
+        75,
+        242,
+        69,
+        165
+      ],
+      "accounts": [
+        {
+          "name": "duel",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  117,
+                  101,
+                  108
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "duel_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "challenger",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "duel_id",
+          "type": "u64"
+        },
+        {
+          "name": "stake",
+          "type": "u64"
+        },
+        {
+          "name": "game_seed",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "create_group_round",
+      "docs": [
+        "Same as create_round but with a max_players constraint (2–5).",
+        "For MVP, no explicit invite list — just a cap."
+      ],
+      "discriminator": [
+        118,
+        37,
+        193,
+        233,
+        105,
+        70,
+        189,
+        97
+      ],
+      "accounts": [
+        {
+          "name": "round",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  111,
+                  117,
+                  110,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "round_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "round_id",
+          "type": "u64"
+        },
+        {
+          "name": "entry_fee",
+          "type": "u64"
+        },
+        {
+          "name": "duration_seconds",
+          "type": "i64"
+        },
+        {
+          "name": "max_players",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "create_round",
+      "docs": [
+        "Creates a new tournament round with an escrow PDA that will hold all",
+        "entry fees. The round has a fixed duration after which it closes.",
+        "",
+        "Security: Only the config authority (our backend wallet) can create rounds.",
+        "The escrow PDA is program-owned — nobody can drain it except the program."
+      ],
+      "discriminator": [
+        229,
+        218,
+        236,
+        169,
+        231,
+        80,
+        134,
+        112
+      ],
+      "accounts": [
+        {
+          "name": "round",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  111,
+                  117,
+                  110,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "round_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "round_id",
+          "type": "u64"
+        },
+        {
+          "name": "entry_fee",
+          "type": "u64"
+        },
+        {
+          "name": "duration_seconds",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "decline_duel",
+      "discriminator": [
+        25,
+        189,
+        214,
+        13,
+        102,
+        248,
+        135,
+        39
+      ],
+      "accounts": [
+        {
+          "name": "duel",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  117,
+                  101,
+                  108
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "duel_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "challenger",
+          "writable": true
+        },
+        {
+          "name": "caller",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "_duel_id",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "enter_round",
+      "docs": [
+        "Player transfers the exact entry fee from their wallet directly into",
+        "the round's escrow PDA. Also enforces the 5-per-day limit.",
+        "",
+        "Security: Entry fee goes wallet → escrow PDA. Backend never touches it.",
+        "Daily record PDA resets automatically at the start of each new UTC day."
+      ],
+      "discriminator": [
+        166,
+        162,
+        71,
+        230,
+        92,
+        51,
+        37,
+        43
+      ],
+      "accounts": [
+        {
+          "name": "round",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  111,
+                  117,
+                  110,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "round_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "daily_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  97,
+                  105,
+                  108,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "round_id",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "finalise_duel",
+      "docs": [
+        "Backend reveals both scores and the contract pays the winner.",
+        "Both reveals and payout happen in one instruction for simplicity."
+      ],
+      "discriminator": [
+        230,
+        144,
+        216,
+        166,
+        167,
+        152,
+        103,
+        154
+      ],
+      "accounts": [
+        {
+          "name": "duel",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  117,
+                  101,
+                  108
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "duel_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "challenger_score",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  117,
+                  101,
+                  108,
+                  95,
+                  115,
+                  99,
+                  111,
+                  114,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "duel_id"
+              },
+              {
+                "kind": "account",
+                "path": "duel.challenger",
+                "account": "Duel"
+              }
+            ]
+          }
+        },
+        {
+          "name": "opponent_score",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  117,
+                  101,
+                  108,
+                  95,
+                  115,
+                  99,
+                  111,
+                  114,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "duel_id"
+              },
+              {
+                "kind": "account",
+                "path": "duel.opponent",
+                "account": "Duel"
+              }
+            ]
+          }
+        },
+        {
+          "name": "challenger_account",
+          "writable": true
+        },
+        {
+          "name": "opponent_account",
+          "writable": true
+        },
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "duel_id",
+          "type": "u64"
+        },
+        {
+          "name": "challenger_score",
+          "type": "u64"
+        },
+        {
+          "name": "challenger_salt",
+          "type": "string"
+        },
+        {
+          "name": "opponent_score",
+          "type": "u64"
+        },
+        {
+          "name": "opponent_salt",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "finalise_round",
+      "docs": [
+        "After all scores are revealed, this instruction determines the highest",
+        "scorer and pays out 95% to them and 5% to the treasury — atomically.",
+        "",
+        "Security: Both transfers happen in a single instruction. If either fails,",
+        "neither executes. The round PDA signs the outgoing transfers using its",
+        "signer seeds (PDA authority pattern).",
+        "",
+        "NOTE: For the MVP, the backend passes the winner pubkey and the contract",
+        "verifies it by checking the score entries passed as remaining_accounts.",
+        "Each remaining account must be a revealed ScoreEntry. The contract",
+        "confirms the declared winner truly has the highest score."
+      ],
+      "discriminator": [
+        59,
+        101,
+        181,
+        106,
+        131,
+        185,
+        150,
+        39
+      ],
+      "accounts": [
+        {
+          "name": "round",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  111,
+                  117,
+                  110,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "round_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "winner_account",
+          "docs": [
+            "The contract verifies this is the highest scorer by checking remaining_accounts."
+          ],
+          "writable": true
+        },
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "round"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "round_id",
+          "type": "u64"
+        },
+        {
+          "name": "winner",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "initialize_config",
+      "docs": [
+        "Initialises the global ProgramConfig PDA that stores the treasury wallet",
+        "address and the platform fee. Called once after deployment.",
+        "",
+        "Security: Only the deployer (initial authority) can call this. The config",
+        "PDA is derived from a fixed seed so it can only exist once."
+      ],
+      "discriminator": [
+        208,
+        127,
+        21,
+        1,
+        194,
+        190,
+        196,
+        70
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "treasury",
+          "type": "pubkey"
+        },
+        {
+          "name": "fee_bps",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "refund_player",
+      "docs": [
+        "Anyone can call this to trigger a refund for a specific player if:",
+        "- The round was cancelled (min players not met), OR",
+        "- The reveal deadline has passed and the round is still Closed",
+        "(backend failed to reveal/finalise in time)",
+        "",
+        "Security: Refunds go from escrow PDA back to the original player wallet.",
+        "The caller doesn't need to be the player — anyone can trigger it."
+      ],
+      "discriminator": [
+        251,
+        32,
+        76,
+        233,
+        171,
+        106,
+        120,
+        46
+      ],
+      "accounts": [
+        {
+          "name": "round",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  111,
+                  117,
+                  110,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "round_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player",
+          "docs": [
+            "The player being refunded."
+          ],
+          "writable": true
+        },
+        {
+          "name": "score_entry",
+          "docs": [
+            "The score entry proves this player actually entered the round."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  99,
+                  111,
+                  114,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "round_id"
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "caller",
+          "docs": [
+            "Anyone can trigger a refund — the caller doesn't have to be the player."
+          ],
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "round_id",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "reveal_score",
+      "docs": [
+        "After round is closed, backend sends the original score and salt.",
+        "Contract recomputes the hash and verifies it matches the commitment.",
+        "",
+        "Security: If the hash doesn't match, the reveal is rejected. This makes",
+        "score manipulation impossible — the commitment was locked on-chain."
+      ],
+      "discriminator": [
+        182,
+        217,
+        218,
+        105,
+        45,
+        218,
+        207,
+        42
+      ],
+      "accounts": [
+        {
+          "name": "round",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  111,
+                  117,
+                  110,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "round_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "score_entry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  99,
+                  111,
+                  114,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "round_id"
+              },
+              {
+                "kind": "account",
+                "path": "score_entry.player",
+                "account": "ScoreEntry"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "round_id",
+          "type": "u64"
+        },
+        {
+          "name": "score",
+          "type": "u64"
+        },
+        {
+          "name": "salt",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Duel",
+      "discriminator": [
+        126,
+        229,
+        210,
+        60,
+        177,
+        135,
+        124,
+        224
+      ]
+    },
+    {
+      "name": "DuelScore",
+      "discriminator": [
+        141,
+        243,
+        255,
+        92,
+        209,
+        103,
+        86,
+        250
+      ]
+    },
+    {
+      "name": "PlayerDailyRecord",
+      "discriminator": [
+        70,
+        253,
+        82,
+        69,
+        24,
+        11,
+        139,
+        61
+      ]
+    },
+    {
+      "name": "ProgramConfig",
+      "discriminator": [
+        196,
+        210,
+        90,
+        231,
+        144,
+        149,
+        140,
+        63
+      ]
+    },
+    {
+      "name": "Round",
+      "discriminator": [
+        87,
+        127,
+        165,
+        51,
+        73,
+        78,
+        116,
+        174
+      ]
+    },
+    {
+      "name": "ScoreEntry",
+      "discriminator": [
+        95,
+        125,
+        34,
+        185,
+        25,
+        145,
+        2,
+        98
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "DuelAccepted",
+      "discriminator": [
+        237,
+        234,
+        86,
+        197,
+        103,
+        136,
+        209,
+        66
+      ]
+    },
+    {
+      "name": "DuelCreated",
+      "discriminator": [
+        137,
+        77,
+        22,
+        196,
+        90,
+        147,
+        23,
+        37
+      ]
+    },
+    {
+      "name": "DuelFinalised",
+      "discriminator": [
+        110,
+        108,
+        170,
+        248,
+        199,
+        73,
+        159,
+        214
+      ]
+    },
+    {
+      "name": "PlayerEntered",
+      "discriminator": [
+        101,
+        19,
+        105,
+        26,
+        55,
+        244,
+        15,
+        194
+      ]
+    },
+    {
+      "name": "PlayerRefunded",
+      "discriminator": [
+        83,
+        218,
+        165,
+        174,
+        105,
+        50,
+        123,
+        107
+      ]
+    },
+    {
+      "name": "RoundClosed",
+      "discriminator": [
+        45,
+        243,
+        28,
+        22,
+        132,
+        70,
+        175,
+        226
+      ]
+    },
+    {
+      "name": "RoundCreated",
+      "discriminator": [
+        16,
+        19,
+        68,
+        117,
+        87,
+        198,
+        7,
+        124
+      ]
+    },
+    {
+      "name": "RoundFinalised",
+      "discriminator": [
+        200,
+        154,
+        212,
+        27,
+        255,
+        226,
+        191,
+        183
+      ]
+    },
+    {
+      "name": "ScoreCommitted",
+      "discriminator": [
+        134,
+        127,
+        67,
+        225,
+        116,
+        74,
+        253,
+        100
+      ]
+    },
+    {
+      "name": "ScoreRevealed",
+      "discriminator": [
+        120,
+        76,
+        57,
+        128,
+        140,
+        49,
+        210,
+        42
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "RoundNotOpen",
+      "msg": "Round is not open"
+    },
+    {
+      "code": 6001,
+      "name": "RoundExpired",
+      "msg": "Round has expired"
+    },
+    {
+      "code": 6002,
+      "name": "RoundNotExpired",
+      "msg": "Round has not expired yet"
+    },
+    {
+      "code": 6003,
+      "name": "RoundNotClosed",
+      "msg": "Round is not closed"
+    },
+    {
+      "code": 6004,
+      "name": "DailyLimitReached",
+      "msg": "Daily entry limit reached (max 5 per day)"
+    },
+    {
+      "code": 6005,
+      "name": "AlreadyRevealed",
+      "msg": "Score already revealed"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidReveal",
+      "msg": "Invalid reveal — commitment hash mismatch"
+    },
+    {
+      "code": 6007,
+      "name": "RefundNotAvailable",
+      "msg": "Refund not available for this round"
+    },
+    {
+      "code": 6008,
+      "name": "NotEnoughPlayers",
+      "msg": "Not enough players in round"
+    },
+    {
+      "code": 6009,
+      "name": "Unauthorized",
+      "msg": "Unauthorized"
+    },
+    {
+      "code": 6010,
+      "name": "DuelAlreadyAccepted",
+      "msg": "Duel already accepted"
+    },
+    {
+      "code": 6011,
+      "name": "DuelExpired",
+      "msg": "Duel acceptance window expired"
+    },
+    {
+      "code": 6012,
+      "name": "DuelNotAccepted",
+      "msg": "Duel not yet accepted"
+    },
+    {
+      "code": 6013,
+      "name": "GroupFull",
+      "msg": "Group is full"
+    },
+    {
+      "code": 6014,
+      "name": "InvalidEntryFee",
+      "msg": "Entry fee must be greater than 0"
+    },
+    {
+      "code": 6015,
+      "name": "InvalidRoundDuration",
+      "msg": "Round duration must be greater than 0"
+    },
+    {
+      "code": 6016,
+      "name": "Overflow",
+      "msg": "Arithmetic overflow"
+    }
+  ],
+  "types": [
+    {
+      "name": "Duel",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "duel_id",
+            "type": "u64"
+          },
+          {
+            "name": "challenger",
+            "type": "pubkey"
+          },
+          {
+            "name": "opponent",
+            "type": "pubkey"
+          },
+          {
+            "name": "stake_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "DuelStatus"
+              }
+            }
+          },
+          {
+            "name": "seed",
+            "type": "u64"
+          },
+          {
+            "name": "acceptance_deadline",
+            "type": "i64"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DuelAccepted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "duel_id",
+            "type": "u64"
+          },
+          {
+            "name": "opponent",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DuelCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "duel_id",
+            "type": "u64"
+          },
+          {
+            "name": "challenger",
+            "type": "pubkey"
+          },
+          {
+            "name": "stake",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DuelFinalised",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "duel_id",
+            "type": "u64"
+          },
+          {
+            "name": "winner",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DuelScore",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "duel_id",
+            "type": "u64"
+          },
+          {
+            "name": "commitment",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "committed_at",
+            "type": "i64"
+          },
+          {
+            "name": "revealed",
+            "type": "bool"
+          },
+          {
+            "name": "revealed_score",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DuelStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "PendingAcceptance"
+          },
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Closed"
+          },
+          {
+            "name": "Finalised"
+          },
+          {
+            "name": "Declined"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PlayerDailyRecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "date",
+            "type": "i64"
+          },
+          {
+            "name": "entries",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PlayerEntered",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "round_id",
+            "type": "u64"
+          },
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_pool",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PlayerRefunded",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "round_id",
+            "type": "u64"
+          },
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProgramConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "treasury",
+            "type": "pubkey"
+          },
+          {
+            "name": "fee_bps",
+            "type": "u64"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Round",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "round_id",
+            "type": "u64"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "entry_fee",
+            "type": "u64"
+          },
+          {
+            "name": "total_pool",
+            "type": "u64"
+          },
+          {
+            "name": "player_count",
+            "type": "u64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "RoundStatus"
+              }
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "ends_at",
+            "type": "i64"
+          },
+          {
+            "name": "reveal_deadline",
+            "type": "i64"
+          },
+          {
+            "name": "winner",
+            "type": "pubkey"
+          },
+          {
+            "name": "max_players",
+            "type": "u8"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RoundClosed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "round_id",
+            "type": "u64"
+          },
+          {
+            "name": "player_count",
+            "type": "u64"
+          },
+          {
+            "name": "total_pool",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RoundCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "round_id",
+            "type": "u64"
+          },
+          {
+            "name": "entry_fee",
+            "type": "u64"
+          },
+          {
+            "name": "ends_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RoundFinalised",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "round_id",
+            "type": "u64"
+          },
+          {
+            "name": "winner",
+            "type": "pubkey"
+          },
+          {
+            "name": "winner_amount",
+            "type": "u64"
+          },
+          {
+            "name": "treasury_amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RoundStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Open"
+          },
+          {
+            "name": "Closed"
+          },
+          {
+            "name": "Finalised"
+          },
+          {
+            "name": "Cancelled"
+          },
+          {
+            "name": "Refundable"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ScoreCommitted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "round_id",
+            "type": "u64"
+          },
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "committed_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ScoreEntry",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "round_id",
+            "type": "u64"
+          },
+          {
+            "name": "commitment",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "committed_at",
+            "type": "i64"
+          },
+          {
+            "name": "revealed",
+            "type": "bool"
+          },
+          {
+            "name": "revealed_score",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ScoreRevealed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "round_id",
+            "type": "u64"
+          },
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "score",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ]
+}

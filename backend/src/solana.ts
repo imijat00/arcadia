@@ -13,7 +13,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { config } from './config';
 
-const IDL_PATH = path.resolve(__dirname, '../../target/idl/arcadia.json');
+const IDL_PATH = path.resolve(__dirname, 'arcadia.json');
 const idl = JSON.parse(fs.readFileSync(IDL_PATH, 'utf-8'));
 
 const PROGRAM_ID = new PublicKey(config.PROGRAM_ID);

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Arcadia backend — Node.js API server and round manager",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp src/arcadia.json dist/arcadia.json",
     "start": "node dist/server.js",
     "dev": "ts-node src/server.ts",
     "worker": "ts-node src/worker.ts",
