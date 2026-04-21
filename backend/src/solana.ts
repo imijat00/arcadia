@@ -20,13 +20,19 @@ const PROGRAM_ID = new PublicKey(config.PROGRAM_ID);
 
 // ── Keypair & Provider ────────────────────────────────────────────────────────
 
-function loadKeypair(keypairPath: string): Keypair {
-  const expanded = keypairPath.replace('~', process.env.HOME || '');
+function loadKeypair(): Keypair {
+  // Render / cloud: set KEYPAIR_BASE64 = base64(cat ~/.config/solana/id.json)
+  if (config.KEYPAIR_BASE64) {
+    const secret = JSON.parse(Buffer.from(config.KEYPAIR_BASE64, 'base64').toString('utf-8'));
+    return Keypair.fromSecretKey(Uint8Array.from(secret));
+  }
+  // Local: read from file path
+  const expanded = config.WALLET_KEYPAIR_PATH.replace('~', process.env.HOME || '');
   const secret = JSON.parse(fs.readFileSync(expanded, 'utf-8'));
   return Keypair.fromSecretKey(Uint8Array.from(secret));
 }
 
-export const backendKeypair = loadKeypair(config.WALLET_KEYPAIR_PATH);
+export const backendKeypair = loadKeypair();
 export const connection = new Connection(config.RPC_URL, 'confirmed');
 
 const wallet = new anchor.Wallet(backendKeypair);
