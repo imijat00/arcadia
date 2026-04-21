@@ -1,0 +1,36 @@
+# Rust / Anchor
+target/
+.anchor/
+test-ledger/
+
+# Node / TypeScript
+node_modules/
+dist/
+backend/node_modules/
+backend/dist/
+
+# Environment — never commit secrets
+.env
+backend/.env
+
+# Runtime data
+backend/scores.json
+*.db
+
+# Solana keypairs — never commit private keys
+# backend uses WALLET_KEYPAIR_PATH pointing to ~/.config/solana/id.json
+# target/deploy/*-keypair.json is the program upgrade authority — keep it safe
+target/deploy/arcadia-keypair.json
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.Zone.Identifier
+.vscode/
+.idea/
+
+# Claude Code
+.claude/
+
+# Logs
+*.log

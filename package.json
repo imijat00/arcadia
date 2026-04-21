@@ -1,0 +1,23 @@
+{
+  "name": "arcadia",
+  "version": "0.1.0",
+  "description": "Arcadia — Solana skill-based gaming platform",
+  "scripts": {
+    "test": "ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.31.1",
+    "@solana/web3.js": "^1.95.0",
+    "bn.js": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.5",
+    "@types/chai": "^4.3.16",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "^20.14.9",
+    "chai": "^4.4.1",
+    "mocha": "^7.2.0",
+    "ts-mocha": "^10.0.0",
+    "typescript": "^5.5.3"
+  }
+}
